@@ -126,7 +126,18 @@ The `/validation/username/:username` endpoint provides real-time username availa
 
 ## Password Constraints
 
-*(Please document the specific password complexity rules you decided to implement here, e.g.:)*
+  ```{
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    },
+    {
+      message:
+        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+    }```
+
 *   Minimum length: 8 characters
 *   Requires at least one uppercase letter.
 *   Requires at least one lowercase letter.
