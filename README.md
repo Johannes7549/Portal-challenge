@@ -1,98 +1,153 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Partner Portal User Management Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This project implements a horizontally scalable user management service as per the requirements of the Partner Portal Challenge. It provides core user management functionalities, role-based access control, efficient caching using Redis, and real-time username availability validation with RedisBloom.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Challenge Overview
 
-## Description
+The goal was to design and implement a user management service with full CRUD support, RBAC, and efficient caching/validation strategies using Redis. Key aspects included API design, data modeling, authorization, and caching techniques.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Core Features Implemented
 
-## Project setup
+*   **Full User CRUD:** Endpoints for creating, reading, updating, and deleting user entities.
+*   **Authentication:** Basic signup and login flow using JWT for issuing authorization tokens.
+*   **Role-Based Access Control (RBAC):** Implementation of `admin`, `editor`, and `viewer` roles with a `RolesGuard` and `@Roles()` decorator to enforce permissions based on the defined matrix.
+*   **Real-time Username Validation:** A lightweight API endpoint (`GET /validation/username/:username`) for checking username availability using a RedisBloom filter for high performance and reduced database load.
+*   **Caching:** Implementation of a caching strategy for read endpoints using `@nestjs/cache-manager` with Redis as the store. Cache invalidation (cache-busting) is performed on mutation operations to ensure data consistency.
+*   **Centralized Cache:** Using Redis as a centralized cache store to maintain consistency across potential multiple service instances.
 
-```bash
-$ npm install
-```
+## Technical Stack
 
-## Compile and run the project
+*   **Framework:** NestJS
+*   **Database:** MongoDB (via Mongoose)
+*   **Caching & Validation:** Redis (specifically requiring the RedisBloom module, ideally via Redis Stack)
+*   **Authentication:** JWT
+*   **Language:** TypeScript
 
-```bash
-# development
-$ npm run start
+## Setup and Installation
 
-# watch mode
-$ npm run start:dev
+### Prerequisites
 
-# production mode
-$ npm run start:prod
-```
+*   Node.js (>= 14.x) and npm or yarn
+*   MongoDB instance
+*   Redis Stack instance (or Redis with RedisBloom module loaded)
+*   Docker (recommended for easily running Redis Stack)
 
-## Run tests
+### Getting Started
 
-```bash
-# unit tests
-$ npm run test
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Johannes7549/Portal-challenge.git
+    cd test-user-management
+    ```
 
-# e2e tests
-$ npm run test:e2e
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
 
-# test coverage
-$ npm run test:cov
-```
+3.  **Set up Environment Variables:**
+    Create a `.env` file in the root directory of the project based on the `.env.example`.
 
-## Deployment
+    ```env
+    MONGODB_URI=mongodb://localhost:27017/your_database_name
+    JWT_SECRET=your_jwt_secret_key
+    JWT_EXPIRATION=1h # e.g., 1 hour
+    REDIS_HOST=localhost # Or your Redis host
+    REDIS_PORT=6379 # Or your Redis port
+    CACHE_TTL=300 # Default cache TTL in seconds (e.g., 5 minutes)
+    ```
+    **Make sure to replace placeholder values with your actual configuration.**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+4.  **Run the application:**
+    ```bash
+    npm run start:dev
+    # or
+    yarn start:dev
+    ```
+    The application should start and connect to your MongoDB and Redis instances. Look for logs indicating successful connections.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+## API Endpoints
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+All endpoints are prefixed with `/`.
 
-## Resources
+### Authentication (`/auth`)
 
-Check out a few resources that may come in handy when working with NestJS:
+*   `POST /auth/signup`: Register a new user.
+*   `POST /auth/login`: Log in a user and issue a JWT.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Users (`/users`)
 
-## Support
+*   `GET /users/all`: Get a list of all users (cached endpoint). Requires authentication and appropriate role (`admin`, `editor`).
+*   `GET /users/profile`: Get the profile of the currently authenticated user. Requires authentication.
+*   `PATCH /users/:username`: Update an existing user's data. Requires authentication and appropriate role (`admin`, `editor`).
+*   `PATCH /users/:username/role`: Update an existing user's role. Requires authentication and `admin` role.
+*   `DELETE /users/:username`: Delete a user. Requires authentication and `admin` role.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Validation (`/validation`)
 
-## Stay in touch
+*   `GET /validation/username/:username`: Check if a username is available in real-time (uses Bloom filter and database fallback).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Authentication and Authorization (RBAC)
 
-## License
+The service uses JWT for authentication. Upon successful login, a JWT is issued, which must be included in subsequent requests (typically in the `Authorization: Bearer <token>` header).
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Role-Based Access Control is implemented using:
+*   `UserRole` enum (`ADMIN`, `EDITOR`, `VIEWER`) defined in `src/users/enums/user-role.enum.ts`.
+*   `@Roles()` decorator to specify required roles for controller endpoints.
+*   `RolesGuard` (`src/guards/roles.guard.ts`) to check if the authenticated user's role matches the required roles.
+
+The permissions matrix followed:
+
+| Role   | Read Users   | Update Users   | Delete Users   | Manage Roles   |
+| :----- | :----------- | :------------- | :------------- | :------------- |
+| Admin  | ✅            | ✅              | ✅              | ✅              |
+| Editor | ✅            | ✅              | ❌              | ❌              |
+| Viewer | ✅ (public only) | ❌              | ❌              | ❌              |
+
+*Note: Public-only read access for Viewers would require additional logic within the service layer or a separate endpoint to filter user data.*
+
+## Caching Strategy
+
+Caching is implemented for read endpoints using NestJS's `CacheModule` with Redis.
+*   `@UseInterceptors(CacheInterceptor)` is applied to read endpoints (`GET /users/all`, `GET /users/profile`) to cache responses.
+*   `@CacheKey()` is used to define unique keys for cache entries (e.g., `'users_list'`).
+*   A cache-busting strategy is used for data consistency. After any mutation operation (create, update, delete) in `UsersService`, the relevant cache keys (`'users_list'`) are explicitly deleted using `CacheManager.del()`. This ensures that subsequent read requests retrieve fresh data from the database and update the cache.
+
+## Real-time Username Validation
+
+The `/validation/username/:username` endpoint provides real-time username availability checks.
+*   It utilizes a Bloom filter stored in Redis (requiring the RedisBloom module).
+*   When a username is checked, it first probes the Bloom filter. If the filter indicates the username definitely does not exist, a fast `available: true` response is returned.
+*   If the Bloom filter indicates the username *might* exist (due to the probabilistic nature of Bloom filters), a database lookup is performed to confirm availability, ensuring no false positives result in stating a username is available when it's not.
+*   New usernames are added to the Bloom filter upon user creation.
+
+## Password Constraints
+
+*(Please document the specific password complexity rules you decided to implement here, e.g.:)*
+*   Minimum length: 8 characters
+*   Requires at least one uppercase letter.
+*   Requires at least one lowercase letter.
+*   Requires at least one digit.
+*   Requires at least one special character.
+
+## User Model Specification
+
+| Field       | Type   | Description                                                                 |
+| :---------- | :----- | :-------------------------------------------------------------------------- |
+| `email`     | string | (Public) Required, valid email format, globally unique.                     |
+| `password`  | string | Required, stored as a hash, must meet defined complexity rules.           |
+| `username`  | string | (Public) Required, globally unique.                                         |
+| `fullName`  | string | (Public) Optional, human-friendly display name.                             |
+| `role`      | Enum   | (Private) Required, one of `admin`, `editor`, `viewer`.                     |
+| `createdAt` | Date   | (Private) Required, timestamp when created.                                 |
+| `updatedAt` | Date   | (Private) Required, timestamp when last modified.                           |
+
+## Future Improvements
+
+*   Implement more granular permission checks beyond just roles (e.g., using a library like `casl`).
+*   Add comprehensive unit and integration tests.
+*   Improve error handling and logging.
+*   Consider more advanced caching patterns (e.g., write-through for writes).
